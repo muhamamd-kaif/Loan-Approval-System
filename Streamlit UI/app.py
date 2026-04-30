@@ -116,11 +116,16 @@ with st.sidebar:
 # --- ASSET LOADING ---
 @st.cache_resource
 def load_assets():
+    import os
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    model_path = os.path.join(base_dir, 'Models', 'xgb_model.pkl')
+    scaler_path = os.path.join(base_dir, 'Models', 'scaler.pkl')
     try:
-        m = joblib.load('xgb_model.pkl')
-        s = joblib.load('scaler.pkl')
+        m = joblib.load(model_path)
+        s = joblib.load(scaler_path)
         return m, s
-    except:
+    except Exception as e:
+        st.error(f"Error loading models: {e}")
         return None, None
 
 model, scaler = load_assets()
@@ -203,12 +208,15 @@ if st.button("EXECUTE RISK ASSESSMENT"):
         }
         df_final = get_input_df(input_data)
         scaled_data = scaler.transform(df_final)
-        prediction = model.predict(scaled_data)[0]
+        # Apply the custom 0.71 strict threshold from the notebook
+        probability = model.predict_proba(scaled_data)[0][1]
         
-        if prediction == 1:
+        if probability >= 0.71:
             st.markdown('<div class="result-card approve">✅ LOAN APPROVED</div>', unsafe_allow_html=True)
+            st.caption(f"Confidence Score: {probability:.1%}")
         else:
             st.markdown('<div class="result-card reject">❌ LOAN REJECTED</div>', unsafe_allow_html=True)
+            st.caption(f"Confidence Score: {probability:.1%} (Requires ≥ 71%)")
         
         st.write("")
         mc1, mc2, mc3 = st.columns(3)
