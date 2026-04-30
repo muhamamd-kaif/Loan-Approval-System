@@ -10,7 +10,7 @@
 ## 🚀 Live Application
 We have deployed the final model on Streamlit for real-time risk assessment. 
 
-🔗 **Access the Live Web App Here:** [Loan Approval System App](https://loan-approval-system-app.streamlit.app/)
+🔗 **Access the Live Web App Here:** [Loan Approval System App](https://ai-based-loan-approval-system.streamlit.app/)
 
 ---
 
